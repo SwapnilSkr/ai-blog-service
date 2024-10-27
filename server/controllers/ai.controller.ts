@@ -22,6 +22,7 @@ import {
   generateSubHeadings,
 } from "../utils/blogGenerator";
 import { stabilityAiGenerations } from "../utils/imageGenerations";
+import { webLoader } from "../utils/webLoader";
 
 export const createAgent = async (req: CustomRequest, res: Response) => {
   try {
@@ -383,32 +384,29 @@ export const chatWIthAIAgent = async (req: CustomRequest, res: Response) => {
 export const CreateAiBlog = async (req: CustomRequest, res: Response) => {
   try {
     const {
-      body: { userInstructions },
+      body: { userInstructions, url },
     } = req;
-    const blogHeading = await generateHeadings(userInstructions);
-    const subHeadings = await generateSubHeadings(
+    let contextProvided: string;
+    if (url) {
+      contextProvided = await webLoader(url);
+    } else {
+      contextProvided = "No Context Provided";
+    }
+    const blogHeading = await generateHeadings(
       userInstructions,
-      blogHeading
+      contextProvided
     );
-    const blogContent = await Promise.all(
-      subHeadings.map(async (subHeading) => {
-        return await generateBlogContent(
-          userInstructions,
-          blogHeading,
-          subHeading.subHeading
-        );
-      })
+    const subHeadingsContent = await generateSubHeadings(
+      userInstructions,
+      contextProvided,
+      blogHeading
     );
     return res.status(StatusCodes.OK).json({
       message: "success",
       blogHeading,
-      subHeadings,
-      blogContent,
+      subHeadingsContent,
     });
-    // const imgobj = {
-    //   inputs: "deep thinker",
-    // };
-    // const image = await togetherAiImageGenerations();
+    // const image = await webLoader("https://huggingface.co/pricing");
     // console.log("image", image);
     // return res.status(StatusCodes.OK).json({
     //   message: "success",

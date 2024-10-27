@@ -1,15 +1,11 @@
 import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/web/playwright";
+import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 export const webLoader = async (url: string) => {
-  const loader = new PlaywrightWebBaseLoader(url, {
-    launchOptions: {
-      headless: true,
-    },
-    gotoOptions: {
-      waitUntil: "domcontentloaded",
-    },
+  const loaderWithSelector = new CheerioWebBaseLoader(url, {
+    selector: "main",
   });
 
-  const docs = await loader.load();
-  return docs;
+  const docsWithSelector = await loaderWithSelector.load();
+  return docsWithSelector[0].pageContent;
 };
