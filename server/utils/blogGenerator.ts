@@ -1,6 +1,10 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 import { llm } from "./keys";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import {
+  blackForestGenerations,
+  stabilityAiGenerations,
+} from "./imageGenerations";
 
 export const generateHeadings = async (userInstructions: string) => {
   const blogHeadingTemplate = `Given the user instructions about a blog the user wants to write, generate a proper Blog Heading (only generate the blog heading and no extra information)
@@ -20,6 +24,31 @@ export const generateHeadings = async (userInstructions: string) => {
   return response;
 };
 
+export const generateSubHeadingInfo = async (subHeading: string) => {
+  const blogSubHeadingImgTemplate = `Given a subheading of a blog, generate a prompt for generating an appropriate image based on the subheading (only generate the appropriate prompt suitable for image generation within 10 words and no extra information)
+  Sub heading : {subHeading}
+  Image Prompt : 
+
+  `;
+
+  const BlogSubHeadingImgChain = PromptTemplate.fromTemplate(
+    blogSubHeadingImgTemplate
+  )
+    .pipe(llm)
+    .pipe(new StringOutputParser());
+
+  const subHeadingImage = await BlogSubHeadingImgChain.invoke({
+    subHeading,
+  });
+  const image = await blackForestGenerations(
+    JSON.stringify({ inputs: `${subHeadingImage}` })
+  );
+  return {
+    subHeading,
+    image,
+  };
+};
+
 export const generateSubHeadings = async (
   userInstructions: string,
   header: string
@@ -37,12 +66,19 @@ export const generateSubHeadings = async (
     .pipe(llm)
     .pipe(new StringOutputParser());
 
-  const response = await BlogSubHeadingChain.invoke({
+  const subHeadingsString = await BlogSubHeadingChain.invoke({
     userInstructions,
     header,
   });
 
-  return response.split("\n");
+  const subHeadingsArray = subHeadingsString.split("\n");
+  const subHeadingsWithImages = await Promise.all(
+    subHeadingsArray.map(async (subHeading) => {
+      const subHeadingInfo = await generateSubHeadingInfo(subHeading);
+      return subHeadingInfo;
+    })
+  );
+  return subHeadingsWithImages;
 };
 
 export const generateBlogContent = async (

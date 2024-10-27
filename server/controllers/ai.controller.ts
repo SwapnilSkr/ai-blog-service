@@ -15,15 +15,13 @@ import { Chat } from "../models/chat.model";
 import { generateChatName } from "../utils/generateChatName";
 import { Conversation } from "../models/conversation.model";
 import { mongoIdType } from "../types/mongooseTypes";
-import { checkTableExists, renameTable } from "../utils/keys";
+import { bucketName, checkTableExists, renameTable } from "../utils/keys";
 import {
   generateBlogContent,
   generateHeadings,
   generateSubHeadings,
 } from "../utils/blogGenerator";
 import { stabilityAiGenerations } from "../utils/imageGenerations";
-
-const bucketName = process.env.AWS_BUCKETNAME || "";
 
 export const createAgent = async (req: CustomRequest, res: Response) => {
   try {
@@ -397,7 +395,7 @@ export const CreateAiBlog = async (req: CustomRequest, res: Response) => {
         return await generateBlogContent(
           userInstructions,
           blogHeading,
-          subHeading
+          subHeading.subHeading
         );
       })
     );
@@ -407,15 +405,15 @@ export const CreateAiBlog = async (req: CustomRequest, res: Response) => {
       subHeadings,
       blogContent,
     });
-    const imgobj = {
-      inputs: "deep thinker",
-    };
-    const image = await stabilityAiGenerations(JSON.stringify(imgobj));
-    console.log("image", image);
-    return res.status(StatusCodes.OK).json({
-      message: "success",
-      image,
-    });
+    // const imgobj = {
+    //   inputs: "deep thinker",
+    // };
+    // const image = await togetherAiImageGenerations();
+    // console.log("image", image);
+    // return res.status(StatusCodes.OK).json({
+    //   message: "success",
+    //   image,
+    // });
   } catch (error) {
     console.log("error", error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

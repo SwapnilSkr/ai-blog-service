@@ -8,6 +8,9 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { MongoClient } from "mongodb";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import postgres from "postgres";
+import { S3Client } from "@aws-sdk/client-s3";
+import { DallEAPIWrapper } from "@langchain/openai";
+import OpenAI from "openai";
 
 dotenv.config();
 
@@ -74,7 +77,13 @@ export const togetherLlm = new TogetherAI({
   model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
   maxTokens: 256,
 });
+export const togetherClient = new OpenAI({
+  apiKey: process.env.TOGETHER_AI_API_KEY,
+  baseURL: "https://api.together.xyz/v1",
+});
 export const HfKey = process.env.HF_TOKEN;
+export const bucketName = process.env.AWS_BUCKETNAME || "";
+export const s3Client = new S3Client({ region: process.env.AWS_REGION });
 export const getSupabaseVectorStore = (tableName: string) => {
   const embeddings = new OpenAIEmbeddings({
     model: "text-embedding-3-small",
@@ -86,6 +95,17 @@ export const getSupabaseVectorStore = (tableName: string) => {
   });
 
   return vectorStore;
+};
+export const DalleConfig = async (prompt: string) => {
+  const tool = new DallEAPIWrapper({
+    n: 1,
+    model: "dall-e-2",
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  const imageURL = await tool.invoke(prompt);
+
+  return imageURL;
 };
 export const checkTableExists = async (tableName: string): Promise<boolean> => {
   const checkTableSQL = `
