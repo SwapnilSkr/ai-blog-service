@@ -21,6 +21,7 @@ import {
   generateHeadings,
   generateSubHeadings,
 } from "../utils/blogGenerator";
+import { stabilityAiGenerations } from "../utils/imageGenerations";
 
 const bucketName = process.env.AWS_BUCKETNAME || "";
 
@@ -381,7 +382,7 @@ export const chatWIthAIAgent = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const CreateAiBlog = async (req: Request, res: Response) => {
+export const CreateAiBlog = async (req: CustomRequest, res: Response) => {
   try {
     const {
       body: { userInstructions },
@@ -405,6 +406,15 @@ export const CreateAiBlog = async (req: Request, res: Response) => {
       blogHeading,
       subHeadings,
       blogContent,
+    });
+    const imgobj = {
+      inputs: "deep thinker",
+    };
+    const image = await stabilityAiGenerations(JSON.stringify(imgobj));
+    console.log("image", image);
+    return res.status(StatusCodes.OK).json({
+      message: "success",
+      image,
     });
   } catch (error) {
     console.log("error", error);

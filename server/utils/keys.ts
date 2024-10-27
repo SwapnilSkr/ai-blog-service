@@ -7,7 +7,6 @@ import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { MongoClient } from "mongodb";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
-import { Client } from "pg";
 import postgres from "postgres";
 
 dotenv.config();
@@ -42,10 +41,7 @@ export const sbApiKey = process.env.SUPABASE_API_KEY as string;
 export const sbUrl = process.env.SUPABASE_PROJECT_URL as string;
 export const openAIApiKey = process.env.OPENAI_API_KEY as string;
 export const sbClient = createClient(sbUrl, sbApiKey);
-const nativeSupabaseClient = new Client({
-  connectionString:
-    "postgresql://postgres.eojvbyorcbukxnswockh:[YOUR-PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:6543/postgres",
-});
+
 export const llm = new ChatOpenAI({ openAIApiKey, modelName: "gpt-4o-mini" });
 export const getAstraConfig = (collectionName: string) => {
   const astraConfig: AstraLibArgs = {
@@ -78,6 +74,7 @@ export const togetherLlm = new TogetherAI({
   model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
   maxTokens: 256,
 });
+export const HfKey = process.env.HF_TOKEN;
 export const getSupabaseVectorStore = (tableName: string) => {
   const embeddings = new OpenAIEmbeddings({
     model: "text-embedding-3-small",
