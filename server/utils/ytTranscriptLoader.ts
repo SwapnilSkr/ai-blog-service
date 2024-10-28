@@ -8,5 +8,5 @@ export const ytTranscriptLoader = async (url: string) => {
 
   const docs = await loader.load();
 
-  return docs;
+  return docs[0].pageContent;
 };

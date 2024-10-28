@@ -53,8 +53,8 @@ export const generateSubHeadingInfo = async (
   const subHeadingImage = await BlogSubHeadingImgChain.invoke({
     subHeading,
   });
-  const image = await blackForestGenerations(
-    JSON.stringify({ inputs: `${subHeadingImage}` })
+  const image = await stabilityAiGenerations(
+    JSON.stringify({ inputs: subHeadingImage })
   );
   const subHeadingContent = await generateBlogContent(
     userInstructions,

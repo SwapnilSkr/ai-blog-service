@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 type S3UploadResult = string | null;
 
@@ -138,4 +139,11 @@ export async function blackForestGenerations(data: string) {
     console.error("Image generation error:", error);
     return null;
   }
+}
+
+export async function backForestApiGenerations(prompt: string) {
+  const { data } = await axios.post("http://localhost:8080/image/generate", {
+    prompt,
+  });
+  return data;
 }

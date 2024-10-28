@@ -21,8 +21,12 @@ import {
   generateHeadings,
   generateSubHeadings,
 } from "../utils/blogGenerator";
-import { stabilityAiGenerations } from "../utils/imageGenerations";
+import {
+  blackForestGenerations,
+  stabilityAiGenerations,
+} from "../utils/imageGenerations";
 import { webLoader } from "../utils/webLoader";
+import { ytTranscriptLoader } from "../utils/ytTranscriptLoader";
 
 export const createAgent = async (req: CustomRequest, res: Response) => {
   try {
@@ -384,11 +388,22 @@ export const chatWIthAIAgent = async (req: CustomRequest, res: Response) => {
 export const CreateAiBlog = async (req: CustomRequest, res: Response) => {
   try {
     const {
-      body: { userInstructions, url },
+      body: { userInstructions, url, ytLink },
     } = req;
     let contextProvided: string;
-    if (url) {
+    if (url && ytLink) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: "failed",
+        error: "Both web urls and youtube urls are not allowed",
+      });
+    }
+    if (url && !ytLink) {
       contextProvided = await webLoader(url);
+    } else {
+      contextProvided = "No Context Provided";
+    }
+    if (ytLink && !url) {
+      contextProvided = await ytTranscriptLoader(ytLink);
     } else {
       contextProvided = "No Context Provided";
     }
@@ -406,12 +421,14 @@ export const CreateAiBlog = async (req: CustomRequest, res: Response) => {
       blogHeading,
       subHeadingsContent,
     });
-    // const image = await webLoader("https://huggingface.co/pricing");
-    // console.log("image", image);
-    // return res.status(StatusCodes.OK).json({
-    //   message: "success",
-    //   image,
-    // });
+    const image = await ytTranscriptLoader(
+      "https://www.youtube.com/watch?v=G1gyNV7mp5E"
+    );
+    console.log("image", image);
+    return res.status(StatusCodes.OK).json({
+      message: "success",
+      image,
+    });
   } catch (error) {
     console.log("error", error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

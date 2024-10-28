@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.14.4",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
@@ -28,6 +29,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.658.1",
     "@datastax/astra-db-ts": "^1.4.1",
+    "@gradio/client": "^1.7.1",
     "@langchain/community": "^0.3.10",
     "@langchain/core": "^0.3.15",
     "@langchain/mongodb": "^0.1.0",
@@ -35,6 +37,7 @@
     "@supabase/supabase-js": "^2.45.4",
     "@types/pg": "^8.11.10",
     "aws-sdk": "^2.1691.0",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "cheerio": "^1.0.0",
     "connect-mongo": "^5.1.0",
